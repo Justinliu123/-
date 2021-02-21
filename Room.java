@@ -1,4 +1,7 @@
 package Hotel_management_system;
+
+import java.util.Objects;
+
 /**
  * 作者：wolf
  * 日期：02/11/2021
@@ -42,5 +45,27 @@ class Room {
 
     public void setCondition(int condition) {
         this.condition = condition;
+    }
+
+    //重写equals方法
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Room room = (Room) o;
+        return number == room.number && condition == room.condition && Objects.equals(type, room.type);
+    }
+    
+    //重写toString方法
+    public String toString() {
+        return "Room{" +
+                "number=" + number +
+                ", type='" + type + '\'' +
+                ", condition=" + condition +
+                '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(number, type, condition);
     }
 }
