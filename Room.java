@@ -35,8 +35,18 @@ class Room {
         return number;
     }
 
-    public int getCondition() {
+    public int getConditionNum() {
         return condition;
+    }
+
+    public String getConditionStr() {
+        if(condition == 0){
+            return "空闲";
+        }else if(condition == 1){
+            return "被预定";
+        }else{
+            return "被占用";
+        }
     }
 
     public String getType() {

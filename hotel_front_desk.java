@@ -11,13 +11,8 @@ import java.util.Scanner;
  * */
 public class hotel_front_desk {
     public static void main(String[] args) {
-        //系统变量
-        int STOREY = 5;                 //酒店层数
-        int ROOM = 10;                  //每层房间数
-        Room [][] rooms;                //所有的酒店房间
-
         //登录所需变量
-        boolean isline = false;         //是否在线，登录成功后上线，即isline赋值为true
+        boolean isline = true;         //是否在线，登录成功后上线，即isline赋值为true
         Login login = new Login();      //登录类，用于登录相关的操作
         String adminID;                 //管理员ID
 
@@ -122,9 +117,9 @@ public class hotel_front_desk {
                     break;
             }
         }
-        rooms = new Room[STOREY+1][ROOM+1];             //初始化----
-        initRooms(rooms,STOREY,ROOM);                   //-----酒店房间
-
+/*        rooms = new Room[STOREY+1][ROOM+1];             //初始化----
+        initRooms(rooms,STOREY,ROOM);                   //-----酒店房间*/
+        Hotel hotel = new Hotel();
         while (isline) {
             System.out.println("\n\n\n\n\n\n\n\n");
             System.out.println("===========================================================");
@@ -143,37 +138,37 @@ public class hotel_front_desk {
                 case 1:{
                     System.out.print("请输入想要预订的房间号：");
                     int num = new Scanner(System.in).nextInt();
-                    int[] index = sreachRoom(rooms,num);
-                    if(index[0] == 0 && index[1] == 0){
+                    if(!hotel.isExistRoom(num)){
                         System.out.println("无该房间！");
                         break;
                     }
-                    if(rooms[index[0]][index[1]].getCondition() == 0){
+                    if(hotel.getConditionNum(num) == 0){
                         System.out.print("输入 '1' 确定，'0' 取消：");
                         if(new Scanner(System.in).nextInt() == 1){
-                            rooms[index[0]][index[1]].setCondition(1);
+                            hotel.setCondition(num,1);
                         }
                     }else{
                         System.out.println("该房间已经被占用，预订失败!");
                     }
                     System.out.println("预订成功！");
+                    System.out.println("\n任意键继续！");
+                    new Scanner(System.in).nextLine();
                     break;
                 }
                 //登记入住
                 case 2:{
                     System.out.print("是否有预订？'1' 有 '0' 没有：");
                     if(new Scanner(System.in).nextInt() == 1){
-                        System.out.print("请输入入住房间：");
+                        System.out.print("请输入要入住的房间号：");
                         int num = new Scanner(System.in).nextInt();
-                        int[] index = sreachRoom(rooms,num);
-                        if(index[0] == 0 && index[1] == 0){
+                        if(!hotel.isExistRoom(num)){
                             System.out.println("无该房间！");
                             break;
                         }
-                        if(rooms[index[0]][index[1]].getCondition() == 0 || rooms[index[0]][index[1]].getCondition() == 1){
+                        if(hotel.getConditionNum(num) == 0 || hotel.getConditionNum(num) == 1){
                             System.out.print("输入 '1' 确定，'0' 取消：");
                             if(new Scanner(System.in).nextInt() == 1){
-                                rooms[index[0]][index[1]].setCondition(2);
+                                hotel.setCondition(num,2);
                             }
                         }else{
                             System.out.println("该房间已经被占用，入住失败!");
@@ -182,72 +177,82 @@ public class hotel_front_desk {
                     else{
                         System.out.print("请输入入住房间：");
                         int num = new Scanner(System.in).nextInt();
-                        int[] index = sreachRoom(rooms,num);
-                        if(index[0] == 0 && index[1] == 0){
+                        if(!hotel.isExistRoom(num)){
                             System.out.println("无该房间！");
                             break;
                         }
-                        if(rooms[index[0]][index[1]].getCondition() == 0){
+                        if(hotel.getConditionNum(num) == 0){
                             System.out.print("输入 '1' 确定，'0' 取消：");
                             if(new Scanner(System.in).nextInt() == 1){
-                                rooms[index[0]][index[1]].setCondition(2);
+                                hotel.setCondition(num,2);
                             }
                         }else{
                             System.out.println("该房间已经被占用，入住失败!");
                         }
                     }
                     System.out.println("成功入住！");
+                    System.out.println("\n任意键继续！");
+                    new Scanner(System.in).nextLine();
                     break;
                 }
+                //退房
                 case 3:{
                     System.out.print("请输入退房房间号：");
                     int num = new Scanner(System.in).nextInt();
-                    int[] index = sreachRoom(rooms,num);
-                    if(index[0] == 0 && index[1] == 0){
+                    if(!hotel.isExistRoom(num)){
                         System.out.println("无该房间！");
                         break;
                     }
-                    if(rooms[index[0]][index[1]].getCondition() != 0){
+                    if(hotel.getConditionNum(num) != 0){
                         System.out.print("输入 '1' 确定，'0' 取消：");
                         if(new Scanner(System.in).nextInt() == 1){
-                            rooms[index[0]][index[1]].setCondition(0);
+                            hotel.setCondition(num,0);
                         }
                     }else{
                         System.out.println("该房间已空置，退房失败!");
                     }
+                    System.out.println("\n任意键继续！");
+                    new Scanner(System.in).nextLine();
                     break;
                 }
+                //查看所有房间信息
                 case 4:{
+                    Room[][] rooms= hotel.getRooms();
                     System.out.println("=============================***********==============================");
                     System.out.println("                             所有房间信息                              ");
                     System.out.println("-----------------------------***********------------------------------");
-                    for (int i = 1; i <= STOREY; i++) {
-                        for (int j = 1; j <= ROOM; j++) {
+                    for (int i = 1; i < rooms.length; i++) {
+                        for (int j = 1; j < rooms[i].length; j++) {
                             System.out.printf("房间号：%3d          房间类型：%5s          房间状态：%5s %n",
                                     rooms[i][j].getNumber(),
                                     rooms[i][j].getType(),
-                                    checkCondition(rooms[i][j].getCondition()));
+                                    rooms[i][j].getConditionStr());
                         }
                     }
                     System.out.println("======================================================================");
+                    System.out.println("\n任意键继续！");
+                    new Scanner(System.in).nextLine();
                     break;
                 }
                 case 5:{
                     System.out.print("请输入您要查询的房间号：");
-                    int []index = sreachRoom(rooms,new Scanner(System.in).nextInt());
-                    if(index[0] == 0 && index[1] == 0){
+                    int num = new Scanner(System.in).nextInt();
+                    if(!hotel.isExistRoom(num)){
                         System.out.println("无该房间！");
                         break;
                     }
+                    Room room = hotel.getRoomObj(num);
                     System.out.println("=============================*******==============================");
                     System.out.println("                             房间信息                              ");
                     System.out.println("-----------------------------*******------------------------------\n");
                     System.out.printf("房间号：%3d          房间类型：%5s          房间状态：%5s %n",
-                            rooms[index[0]][index[1]].getNumber(),
-                            rooms[index[0]][index[1]].getType(),
-                            checkCondition(rooms[index[0]][index[1]].getCondition()));
+                            room.getNumber(),
+                            room.getType(),
+                            room.getConditionStr());
 
-                    System.out.println("=================================================================");
+                    System.out.println("\n=================================================================");
+                    System.out.println("\n任意键继续！");
+                    new Scanner(System.in).nextLine();
                     break;
                 }
                 case 0:{
@@ -270,7 +275,7 @@ public class hotel_front_desk {
      * @param storey 酒店层数（最多九层）
      * @param room 没层房间数（最多99间）
      * 作用：初始化酒店的所有房间，每双层的双号为双人间。
-     */
+     *//*
     static boolean initRooms(Room rooms[][], int storey, int room){
         int num;
         String type;
@@ -287,14 +292,14 @@ public class hotel_front_desk {
             }
         }
         return true;
-    }
+    }*/
 
     /**
      * 转换状态信息   将数字的状态信息转化成字符串
      * @param condition 数字状态信息
      * @return 字符串状态信息
      */
-    static String checkCondition(int condition){
+    /*static String checkCondition(int condition){
         String SCondition;
         if(condition == 0){
             SCondition = "闲置";
@@ -304,14 +309,14 @@ public class hotel_front_desk {
             SCondition = "占用";
         }
         return SCondition;
-    }
+    }*/
 
     /**
      * 按照房间号查找对应下标
      * @param rooms 所有房间数组
      * @param RoomNumber 要找的房间号
      * @return 返回下标数组（第一位为行，第二位为列）
-     */
+     *//*
     static int[] sreachRoom(Room rooms[][],int RoomNumber){
         int[] arr = {0,0};
         for (int i = 1; i < rooms.length; i++) {
@@ -322,7 +327,7 @@ public class hotel_front_desk {
             }
         }
         return arr;
-    }
+    }*/
     /**
      *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
      */
@@ -339,127 +344,6 @@ public class hotel_front_desk {
             else
                 System.out.println("两次密码不一致！");
         }
-        return password;
-    }
-}
-/**
- * @author wolf
- * @date 02/11/2021
- *
- * 作用：酒店管理系统的登录类。
- * */
-class Login{
-    private Admin[] allUser = new Admin[10];    //设置用户限额最多10个账户
-    int adminSize = 0;                          //当前账户数量
-    /**
-     * @param number 输入的登录账户
-     * @param password 输入的登录密码
-     * @return 登录成功返回登录的管理员ID,登录失败返回null
-     * 备注：账户的账户号唯一
-     * */
-    String signIn(int number,String password){
-        if(adminSize == 0){
-            return null;
-        }
-        for (int i = 0; i < adminSize; i++){
-            if(allUser[i].getUserName() == number){
-                if(allUser[i].getPassword().equals(password))
-                    return allUser[i].ID;
-                else
-                    return null;
-            }
-        }
-        return null;
-    }
-    //检测账户号是否重复
-    boolean isRepetition(int number){
-        if(adminSize == 0){
-            return false;
-        }
-        for (int i = 0; i < adminSize; i++){
-            if(allUser[i].getUserName() == number)
-                return true;
-        }
-        return false;
-    }
-
-    boolean signUp(String ID, int number, String password){
-        allUser[adminSize] = new Admin(ID,number,password);
-        adminSize++;
-        return true;
-    }
-    //注销账户，将账户注销后，数组补齐
-    boolean logout(int number,String password){
-        boolean isfind = false;
-        for (int i = 0; i < adminSize; i++){
-            if(isfind){
-                allUser[i-1] = allUser[i];
-            }
-            if(allUser[i].getUserName() == number) {
-                if(allUser[i].getPassword().equals(password)){
-                    isfind = true;
-                }
-                else
-                    break;
-            }
-        }
-        if(isfind) {
-            adminSize--;
-            return true;
-        }
-        return false;
-    }
-    boolean modifiPassword(int number,String oldPassword,String newPassword){
-        if(adminSize == 0){
-            return false;
-        }
-        for (int i = 0; i < adminSize; i++){
-            if(allUser[i].getUserName() == number){
-               if(allUser[i].setPassword(oldPassword,newPassword))
-                   return true;
-               else
-                   return false;
-            }
-        }
-        return false;
-    }
-}
-/**
- * @author wolf
- * @date 02/11/2021
- *
- * 作用： 系统管理员类，登录系统使用的管理员账户
- * */
-class Admin{
-    String ID;                          //账户ID
-    final private int userName;         //登录账户
-    private String password;            //登录密码
-
-    //Admin的构造函数。只有ID、账户、密码全部确定才可创建一个管理员账户。
-    Admin(String ID,int userName,String password){
-        this.ID = ID;
-        this.userName = userName;
-        this.password = password;
-    }
-
-    public int getUserName() {
-        return userName;
-    }
-
-    /**
-     * @param oldPassword 旧密码
-     * @param newpassword 新密码
-     * @return 修改密码成功返回true，失败返回false
-     * */
-    public boolean setPassword(String oldPassword,String newpassword) {
-        if (oldPassword.equals(password)){
-            password = newpassword;
-            return true;
-        }
-        return false;
-    }
-
-    public String getPassword() {
         return password;
     }
 }
